@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Income Dashboard - AliBuyra Marketplace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00BFA6;
+            --secondary: #1B263B;
+            --accent: #FFD700;
+            --bg-light: #F7F9FA;
+            --bg-dark: #0D1117;
+            --gradient: linear-gradient(45deg, #00BFA6, #6A00F4);
+        }
+        
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg-light);
+        }
+        
+        .glass-nav {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.9);
+            border-bottom: 1px solid rgba(0, 191, 166, 0.2);
+        }
+        
+        .gradient-text {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .dashboard-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+        
+        .metric-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 191, 166, 0.15);
+        }
+        
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 191, 166, 0.3);
+        }
+        
+        .time-selector {
+            background: white;
+            border-radius: 8px;
+            padding: 4px;
+            display: flex;
+            gap: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .time-selector button {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            background: transparent;
+            color: #6b7280;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .time-selector button.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .ai-prediction {
+            background: linear-gradient(135deg, rgba(0, 191, 166, 0.1) 0%, rgba(106, 0, 244, 0.1) 100%);
+            border: 2px solid rgba(0, 191, 166, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .withdrawal-modal {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+        
+        .chart-container {
+            height: 300px;
+            width: 100%;
+        }
+        
+        .animate-pulse-fast {
+            animation: pulse-fast 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-fast {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .floating-icon {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="glass-nav fixed top-0 left-0 right-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold gradient-text">AliBuyra</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="index.html" class="text-gray-700 hover:text-teal-600 px-3 py-2 text-sm font-medium transition-colors">Home</a>
+                        <a href="products.html" class="text-gray-700 hover:text-teal-600 px-3 py-2 text-sm font-medium transition-colors">Products</a>
+                        <a href="dashboard.html" class="text-gray-900 hover:text-teal-600 px-3 py-2 text-sm font-medium transition-colors">Dashboard</a>
+                        <button class="btn-primary">Sign In</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Dashboard -->
+    <div class="pt-20 min-h-screen">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Header -->
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Income Dashboard</h2>
+                <p class="text-gray-600">Real-time analytics and AI-powered profit predictions</p>
+            </div>
+
+            <!-- Key Metrics -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="metric-card">
+                    <div class="text-3xl font-bold gradient-text mb-2" id="daily-income">$2,847</div>
+                    <div class="text-sm text-gray-600 mb-1">Today's Income</div>
+                    <div class="text-xs text-green-600">↗ +12.5% from yesterday</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="text-3xl font-bold gradient-text mb-2" id="weekly-income">$18,392</div>
+                    <div class="text-sm text-gray-600 mb-1">This Week</div>
+                    <div class="text-xs text-green-600">↗ +8.3% from last week</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="text-3xl font-bold gradient-text mb-2" id="monthly-income">$67,834</div>
+                    <div class="text-sm text-gray-600 mb-1">This Month</div>
+                    <div class="text-xs text-green-600">↗ +15.7% from last month</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="text-3xl font-bold gradient-text mb-2" id="ai-forecast">$89,231</div>
+                    <div class="text-sm text-gray-600 mb-1">AI Next Month Forecast</div>
+                    <div class="text-xs text-blue-600">🤖 Predicted</div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="grid lg:grid-cols-2 gap-8 mb-8">
+                <!-- Income Chart -->
+                <div class="dashboard-card">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-semibold text-gray-900">Income Analytics</h3>
+                        <div class="time-selector">
+                            <button onclick="updateChartPeriod('hourly')" id="hourly-btn" class="active">Hourly</button>
+                            <button onclick="updateChartPeriod('daily')" id="daily-btn">Daily</button>
+                            <button onclick="updateChartPeriod('weekly')" id="weekly-btn">Weekly</button>
+                        </div>
+                    </div>
+                    <div id="income-chart" class="chart-container"></div>
+                </div>
+                
+                <!-- AI Prediction Chart -->
+                <div class="dashboard-card">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-semibold text-gray-900">AI Profit Predictor</h3>
+                        <div class="floating-icon text-2xl">🤖</div>
+                    </div>
+                    <div id="prediction-chart" class="chart-container"></div>
+                </div>
+            </div>
+
+            <!-- Detailed Analytics -->
+            <div class="grid lg:grid-cols-3 gap-8 mb-8">
+                <!-- Top Products -->
+                <div class="dashboard-card">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Top Performing Products</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center">
+                                    <span class="text-teal-600 text-sm">👕</span>
+                                </div>
+                                <div>
+                                    <div class="font-medium text-sm">Premium T-Shirt</div>
+                                    <div class="text-xs text-gray-500">Fashion</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-semibold text-sm">$1,247</div>
+                                <div class="text-xs text-green-600">+23%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                                    <span class="text-purple-600 text-sm">💻</span>
+                                </div>
+                                <div>
+                                    <div class="font-medium text-sm">Gaming Laptop</div>
+                                    <div class="text-xs text-gray-500">Electronics</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-semibold text-sm">$987</div>
+                                <div class="text-xs text-green-600">+18%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                    <span class="text-yellow-600 text-sm">🧴</span>
+                                </div>
+                                <div>
+                                    <div class="font-medium text-sm">Skincare Set</div>
+                                    <div class="text-xs text-gray-500">Beauty</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-semibold text-sm">$756</div>
+                                <div class="text-xs text-green-600">+15%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Affiliate Earnings -->
+                <div class="dashboard-card">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Affiliate Earnings</h3>
+                    <div class="space-y-4">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold gradient-text mb-1" id="affiliate-balance">$3,456</div>
+                            <div class="text-sm text-gray-600 mb-4">Available Balance</div>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-600">This Month</span>
+                                <span class="font-semibold">$2,891</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-600">Referrals</span>
+                                <span class="font-semibold">147 users</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-600">Conversion Rate</span>
+                                <span class="font-semibold">12.3%</span>
+                            </div>
+                        </div>
+                        
+                        <button onclick="openWithdrawalModal()" class="btn-primary w-full mt-4">
+                            Withdraw Funds
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- AI Insights -->
+                <div class="dashboard-card">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">AI Insights</h3>
+                    <div class="space-y-4">
+                        <div class="ai-insight">
+                            <div class="flex items-start gap-3">
+                                <div class="text-2xl">📈</div>
+                                <div>
+                                    <div class="font-medium text-sm mb-1">Peak Shopping Hours</div>
+                                    <div class="text-xs text-gray-600">2PM - 6PM shows 34% higher conversion rates</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="ai-insight">
+                            <div class="flex items-start gap-3">
+                                <div class="text-2xl">🎯</div>
+                                <div>
+                                    <div class="font-medium text-sm mb-1">Trending Category</div>
+                                    <div class="text-xs text-gray-600">Electronics up 45% this week</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="ai-insight">
+                            <div class="flex items-start gap-3">
+                                <div class="text-2xl">💡</div>
+                                <div>
+                                    <div class="font-medium text-sm mb-1">Optimization Tip</div>
+                                    <div class="text-xs text-gray-600">Add more gaming products to inventory</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Goals & Progress -->
+            <div class="dashboard-card mb-8">
+                <h3 class="text-xl font-semibold text-gray-900 mb-6">Monthly Goals Progress</h3>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold gradient-text mb-2">$67,834</div>
+                        <div class="text-sm text-gray-600 mb-3">of $75,000 goal</div>
+                        <div class="progress-bar mb-2">
+                            <div class="progress-fill" style="width: 90.4%"></div>
+                        </div>
+                        <div class="text-xs text-gray-500">90.4% Complete</div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="text-2xl font-bold gradient-text mb-2">1,247</div>
+                        <div class="text-sm text-gray-600 mb-3">of 1,500 sales goal</div>
+                        <div class="progress-bar mb-2">
+                            <div class="progress-fill" style="width: 83.1%"></div>
+                        </div>
+                        <div class="text-xs text-gray-500">83.1% Complete</div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="text-2xl font-bold gradient-text mb-2">4.8★</div>
+                        <div class="text-sm text-gray-600 mb-3">of 5.0 rating goal</div>
+                        <div class="progress-bar mb-2">
+                            <div class="progress-fill" style="width: 96%"></div>
+                        </div>
+                        <div class="text-xs text-gray-500">96% Complete</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdrawal Modal -->
+    <div id="withdrawal-modal" class="fixed inset-0 withdrawal-modal z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg max-w-md w-full">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Withdraw Funds</h3>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Amount</label>
+                            <input type="number" id="withdrawal-amount" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-teal-600" placeholder="Enter amount" max="3456">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
+                            <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
+                                <option>Bank Transfer</option>
+                                <option>PayPal</option>
+                                <option>Stripe</option>
+                                <option>Cryptocurrency</option>
+                            </select>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm text-gray-600">Available Balance:</span>
+                                <span class="font-semibold">$3,456.00</span>
+                            </div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm text-gray-600">Withdrawal Fee:</span>
+                                <span class="font-semibold">$25.00</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-600">Net Amount:</span>
+                                <span class="font-semibold" id="net-amount">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-3 mt-6">
+                        <button onclick="closeWithdrawalModal()" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                            Cancel
+                        </button>
+                        <button onclick="processWithdrawal()" class="flex-1 btn-primary">
+                            Withdraw
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>
