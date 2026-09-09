@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AliBuyra - AI-Powered Marketplace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00BFA6;
+            --secondary: #1B263B;
+            --accent: #FFD700;
+            --bg-light: #F7F9FA;
+            --bg-dark: #0D1117;
+            --gradient: linear-gradient(45deg, #00BFA6, #6A00F4);
+        }
+        
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg-light);
+            overflow-x: hidden;
+        }
+        
+        .hero-bg {
+            background: linear-gradient(135deg, rgba(0, 191, 166, 0.1) 0%, rgba(27, 38, 59, 0.1) 100%);
+            position: relative;
+        }
+        
+        .gradient-text {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .glass-nav {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.9);
+            border-bottom: 1px solid rgba(0, 191, 166, 0.2);
+        }
+        
+        .product-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-8px) rotateX(5deg);
+            box-shadow: 0 25px 50px rgba(0, 191, 166, 0.2);
+        }
+        
+        .category-card {
+            transition: all 0.3s ease;
+            background: white;
+            border: 2px solid transparent;
+        }
+        
+        .category-card:hover {
+            border-color: var(--primary);
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 191, 166, 0.15);
+        }
+        
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 191, 166, 0.3);
+        }
+        
+        .floating-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .ai-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .chat-bubble {
+            background: var(--primary);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .chat-bubble:hover {
+            background: var(--secondary);
+            transform: scale(1.1);
+        }
+        
+        .splide__slide img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+        
+        .metric-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+        
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .animate-pulse-slow {
+            animation: pulse-slow 3s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="glass-nav fixed top-0 left-0 right-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold gradient-text">AliBuyra</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="index.html" class="text-gray-900 hover:text-teal-600 px-3 py-2 text-sm font-medium transition-colors">Home</a>
+                        <a href="products.html" class="text-gray-700 hover:text-teal-600 px-3 py-2 text-sm font-medium transition-colors">Products</a>
+                        <a href="dashboard.html" class="text-gray-700 hover:text-teal-600 px-3 py-2 text-sm font-medium transition-colors">Dashboard</a>
+                        <button class="btn-primary">Sign In</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-bg min-h-screen flex items-center justify-center pt-16 relative">
+        <div class="floating-particles" id="particles"></div>
+        <div class="hero-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="animate-float">
+                <h2 class="text-5xl md:text-7xl font-bold text-gray-900 mb-6">
+                    AI-Powered
+                    <span class="gradient-text block">Marketplace</span>
+                </h2>
+            </div>
+            <p class="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto animate-pulse-slow">
+                Discover trending products with intelligent recommendations, real-time analytics, and seamless shopping experience.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+                <a href="products.html" class="btn-primary text-lg px-8 py-4">Start Shopping</a>
+                <a href="dashboard.html" class="bg-white text-gray-900 border-2 border-gray-200 px-8 py-4 rounded-lg font-semibold hover:border-teal-600 transition-colors">View Dashboard</a>
+            </div>
+            
+            <!-- Hero Metrics -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+                <div class="metric-card">
+                    <div class="text-3xl font-bold gradient-text" id="products-count">45K+</div>
+                    <div class="text-sm text-gray-600">Products</div>
+                </div>
+                <div class="metric-card">
+                    <div class="text-3xl font-bold gradient-text" id="users-count">2.1M</div>
+                    <div class="text-sm text-gray-600">Active Users</div>
+                </div>
+                <div class="metric-card">
+                    <div class="text-3xl font-bold gradient-text" id="revenue-count">$12.5M</div>
+                    <div class="text-sm text-gray-600">Revenue</div>
+                </div>
+                <div class="metric-card">
+                    <div class="text-3xl font-bold gradient-text" id="ai-accuracy">98.5%</div>
+                    <div class="text-sm text-gray-600">AI Accuracy</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Product Categories -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h3 class="text-4xl font-bold text-gray-900 mb-4">Shop by Category</h3>
+                <p class="text-xl text-gray-600">Discover products across 9 popular categories</p>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-8">
+                <div class="category-card p-6 rounded-xl text-center cursor-pointer" onclick="filterProducts('fashion')">
+                    <div class="text-4xl mb-4">👕</div>
+                    <h4 class="text-lg font-semibold text-gray-900 mb-2">T-shirts & Fashion</h4>
+                    <p class="text-sm text-gray-600">Trending apparel and accessories</p>
+                </div>
+                
+                <div class="category-card p-6 rounded-xl text-center cursor-pointer" onclick="filterProducts('shoes')">
+                    <div class="text-4xl mb-4">👞</div>
+                    <h4 class="text-lg font-semibold text-gray-900 mb-2">Shoes & Footwear</h4>
+                    <p class="text-sm text-gray-600">Latest footwear collections</p>
+                </div>
+                
+                <div class="category-card p-6 rounded-xl text-center cursor-pointer" onclick="filterProducts('clothing')">
+                    <div class="text-4xl mb-4">🧥</div>
+                    <h4 class="text-lg font-semibold text-gray-900 mb-2">Men's & Women's Clothing</h4>
+                    <p class="text-sm text-gray-600">Complete fashion wardrobe</p>
+                </div>
+                
+                <div class="category-card p-6 rounded-xl text-center cursor-pointer" onclick="filterProducts('flowers')">
+                    <div class="text-4xl mb-4">🌸</div>
+                    <h4 class="text-lg font-semibold text-gray-900 mb-2">Flowers & Gifts</h4>
+                    <p class="text-sm text-gray-600">Perfect gifts for every occasion</p>
+                </div>
+                
+                <div class="category-card p-6 rounded-xl text-center cursor-pointer" onclick="filterProducts('electronics')">
+                    <div class="text-4xl mb-4">💻</div>
+                    <h4 class="text-lg font-semibold text-gray-900 mb-2">Electronics</h4>
+                    <p class="text-sm text-gray-600">Latest tech and gadgets</p>
+                </div>
+                
+                <div class="category-card p-6 rounded-xl text-center cursor-pointer" onclick="filterProducts('home')">
+                    <div class="text-4xl mb-4">🏠</div>
+                    <h4 class="text-lg font-semibold text-gray-900 mb-2">Home & Lifestyle</h4>
+                    <p class="text-sm text-gray-600">Make your space beautiful</p>
+                </div>
+                
+                <div class="category-card p-6 rounded-xl text-center cursor-pointer" onclick="filterProducts('beauty')">
+                    <div class="text-4xl mb-4">🧴</div>
+                    <h4 class="text-lg font-semibold text-gray-900 mb-2">Beauty & Health</h4>
+                    <p class="text-sm text-gray-600">Skincare and wellness</p>
+                </div>
+                
+                <div class="category-card p-6 rounded-xl text-center cursor-pointer" onclick="filterProducts('grocery')">
+                    <div class="text-4xl mb-4">🛒</div>
+                    <h4 class="text-lg font-semibold text-gray-900 mb-2">Grocery & Food</h4>
+                    <p class="text-sm text-gray-600">Fresh and organic products</p>
+                </div>
+                
+                <div class="category-card p-6 rounded-xl text-center cursor-pointer" onclick="filterProducts('gaming')">
+                    <div class="text-4xl mb-4">🕹️</div>
+                    <h4 class="text-lg font-semibold text-gray-900 mb-2">Gaming & Gadgets</h4>
+                    <p class="text-sm text-gray-600">Gaming gear and accessories</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trending Products -->
+    <section class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h3 class="text-4xl font-bold text-gray-900 mb-4">Trending Now</h3>
+                <p class="text-xl text-gray-600">Most popular products this week</p>
+            </div>
+            
+            <div class="splide" id="trending-slider">
+                <div class="splide__track">
+                    <ul class="splide__list" id="trending-products">
+                        <!-- Products will be loaded dynamically -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Features -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h3 class="text-4xl font-bold text-gray-900 mb-4">Powered by AI</h3>
+                <p class="text-xl text-gray-600">Intelligent shopping experience</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="text-center">
+                    <div class="bg-gradient-to-br from-teal-400 to-teal-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-white text-2xl">🧠</span>
+                    </div>
+                    <h4 class="text-xl font-semibold text-gray-900 mb-2">Smart Recommendations</h4>
+                    <p class="text-gray-600">AI analyzes your preferences to suggest perfect products</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="bg-gradient-to-br from-purple-400 to-purple-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-white text-2xl">📊</span>
+                    </div>
+                    <h4 class="text-xl font-semibold text-gray-900 mb-2">Real-time Analytics</h4>
+                    <p class="text-gray-600">Track trends and make data-driven decisions</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="bg-gradient-to-br from-yellow-400 to-yellow-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-white text-2xl">🔮</span>
+                    </div>
+                    <h4 class="text-xl font-semibold text-gray-900 mb-2">Profit Predictor</h4>
+                    <p class="text-gray-600">AI forecasts your potential earnings and market trends</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter -->
+    <section class="py-20 bg-gradient-to-r from-teal-600 to-purple-600">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h3 class="text-4xl font-bold text-white mb-4">Stay Updated</h3>
+            <p class="text-xl text-white mb-8">Get the latest deals and AI recommendations</p>
+            <div class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+                <input type="email" placeholder="Enter your email" class="flex-1 px-4 py-3 rounded-lg border-none outline-none">
+                <button class="bg-white text-teal-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">Subscribe</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="gradient-text text-2xl font-bold mb-4">AliBuyra</div>
+            <p class="text-gray-400 mb-4">AI-Powered Marketplace for the Future</p>
+            <p class="text-sm text-gray-500">© 2024 AliBuyra. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- AI Chat Widget -->
+    <div class="ai-widget">
+        <div class="chat-bubble" onclick="toggleChat()">
+            <span id="chat-icon">💬</span>
+        </div>
+        <div id="chat-panel" class="hidden absolute bottom-20 right-0 bg-white rounded-lg shadow-2xl w-80 h-96">
+            <div class="bg-teal-600 text-white p-4 rounded-t-lg">
+                <h4 class="font-semibold">AI Assistant</h4>
+                <p class="text-sm opacity-90">Ask me anything!</p>
+            </div>
+            <div class="p-4 h-64 overflow-y-auto" id="chat-messages">
+                <div class="bg-gray-100 p-2 rounded-lg mb-2">
+                    <p class="text-sm">Hi! I'm your AI shopping assistant. How can I help you today?</p>
+                </div>
+            </div>
+            <div class="p-4 border-t">
+                <div class="flex gap-2">
+                    <input type="text" placeholder="Type a message..." class="flex-1 px-3 py-2 border rounded-lg text-sm" id="chat-input">
+                    <button onclick="sendMessage()" class="bg-teal-600 text-white px-4 py-2 rounded-lg text-sm">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>
