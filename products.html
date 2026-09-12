@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products - AliBuyra Marketplace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00BFA6;
+            --secondary: #1B263B;
+            --accent: #FFD700;
+            --bg-light: #F7F9FA;
+            --bg-dark: #0D1117;
+            --gradient: linear-gradient(45deg, #00BFA6, #6A00F4);
+        }
+        
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg-light);
+        }
+        
+        .glass-nav {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.9);
+            border-bottom: 1px solid rgba(0, 191, 166, 0.2);
+        }
+        
+        .gradient-text {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .filter-sidebar {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .product-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-8px) rotateX(5deg);
+            box-shadow: 0 25px 50px rgba(0, 191, 166, 0.2);
+        }
+        
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 191, 166, 0.3);
+        }
+        
+        .price-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: #e2e8f0;
+            outline: none;
+        }
+        
+        .price-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+        }
+        
+        .price-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: none;
+        }
+        
+        .ai-recommendation {
+            background: linear-gradient(135deg, rgba(0, 191, 166, 0.1) 0%, rgba(106, 0, 244, 0.1) 100%);
+            border: 2px solid rgba(0, 191, 166, 0.3);
+        }
+        
+        .cart-item {
+            transition: all 0.3s ease;
+        }
+        
+        .cart-item:hover {
+            background: rgba(0, 191, 166, 0.05);
+        }
+        
+        .search-input {
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            box-shadow: 0 0 0 3px rgba(0, 191, 166, 0.1);
+            border-color: var(--primary);
+        }
+        
+        .filter-tag {
+            background: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="glass-nav fixed top-0 left-0 right-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold gradient-text">AliBuyra</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="index.html" class="text-gray-700 hover:text-teal-600 px-3 py-2 text-sm font-medium transition-colors">Home</a>
+                        <a href="products.html" class="text-gray-900 hover:text-teal-600 px-3 py-2 text-sm font-medium transition-colors">Products</a>
+                        <a href="dashboard.html" class="text-gray-700 hover:text-teal-600 px-3 py-2 text-sm font-medium transition-colors">Dashboard</a>
+                        <button class="btn-primary">Sign In</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="pt-20 min-h-screen">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Header -->
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">All Products</h2>
+                <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+                    <div class="flex-1 max-w-md">
+                        <input type="text" id="search-input" placeholder="Search products..." 
+                               class="search-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none">
+                    </div>
+                    <div class="flex gap-2">
+                        <select id="sort-select" class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none">
+                            <option value="featured">Featured</option>
+                            <option value="price-low">Price: Low to High</option>
+                            <option value="price-high">Price: High to Low</option>
+                            <option value="rating">Highest Rated</option>
+                            <option value="newest">Newest</option>
+                        </select>
+                        <button onclick="toggleCart()" class="btn-primary relative">
+                            🛒 Cart (<span id="cart-count">0</span>)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- Filter Sidebar -->
+                <div class="lg:w-1/4">
+                    <div class="filter-sidebar p-6 sticky top-24">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Filters</h3>
+                        
+                        <!-- Active Filters -->
+                        <div id="active-filters" class="mb-4 hidden">
+                            <div class="flex flex-wrap gap-2" id="filter-tags"></div>
+                            <button onclick="clearAllFilters()" class="text-sm text-red-600 hover:text-red-800 mt-2">Clear All</button>
+                        </div>
+                        
+                        <!-- Categories -->
+                        <div class="mb-6">
+                            <h4 class="font-medium text-gray-900 mb-3">Categories</h4>
+                            <div class="space-y-2">
+                                <label class="flex items-center">
+                                    <input type="checkbox" value="fashion" class="category-filter mr-2" onchange="applyFilters()">
+                                    <span class="text-sm">Fashion & T-shirts</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" value="shoes" class="category-filter mr-2" onchange="applyFilters()">
+                                    <span class="text-sm">Shoes & Footwear</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" value="clothing" class="category-filter mr-2" onchange="applyFilters()">
+                                    <span class="text-sm">Clothing</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" value="flowers" class="category-filter mr-2" onchange="applyFilters()">
+                                    <span class="text-sm">Flowers & Gifts</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" value="electronics" class="category-filter mr-2" onchange="applyFilters()">
+                                    <span class="text-sm">Electronics</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" value="home" class="category-filter mr-2" onchange="applyFilters()">
+                                    <span class="text-sm">Home & Lifestyle</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" value="beauty" class="category-filter mr-2" onchange="applyFilters()">
+                                    <span class="text-sm">Beauty & Health</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" value="grocery" class="category-filter mr-2" onchange="applyFilters()">
+                                    <span class="text-sm">Grocery & Food</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" value="gaming" class="category-filter mr-2" onchange="applyFilters()">
+                                    <span class="text-sm">Gaming & Gadgets</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Price Range -->
+                        <div class="mb-6">
+                            <h4 class="font-medium text-gray-900 mb-3">Price Range</h4>
+                            <div class="space-y-3">
+                                <input type="range" id="price-min" class="price-slider w-full" min="0" max="1000" value="0" onchange="updatePriceRange()">
+                                <input type="range" id="price-max" class="price-slider w-full" min="0" max="1000" value="1000" onchange="updatePriceRange()">
+                                <div class="flex justify-between text-sm text-gray-600">
+                                    <span>$<span id="price-min-value">0</span></span>
+                                    <span>$<span id="price-max-value">1000</span></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Rating -->
+                        <div class="mb-6">
+                            <h4 class="font-medium text-gray-900 mb-3">Minimum Rating</h4>
+                            <div class="space-y-2">
+                                <label class="flex items-center">
+                                    <input type="radio" name="rating" value="4" class="mr-2" onchange="applyFilters()">
+                                    <span class="text-sm">4+ Stars</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="rating" value="3" class="mr-2" onchange="applyFilters()">
+                                    <span class="text-sm">3+ Stars</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="rating" value="0" class="mr-2" onchange="applyFilters()" checked>
+                                    <span class="text-sm">All Ratings</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- AI Recommendations Toggle -->
+                        <div class="ai-recommendation p-4 rounded-lg">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="ai-recommendations" class="mr-2" onchange="toggleAIRecommendations()">
+                                <span class="text-sm font-medium">🤖 AI Recommendations</span>
+                            </label>
+                            <p class="text-xs text-gray-600 mt-1">Show products based on your interests</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Products Grid -->
+                <div class="lg:w-3/4">
+                    <div class="mb-4 flex justify-between items-center">
+                        <p class="text-gray-600"><span id="product-count">45</span> products found</p>
+                        <div class="flex gap-2">
+                            <button onclick="toggleView('grid')" id="grid-view" class="p-2 bg-teal-600 text-white rounded">
+                                ⊞
+                            </button>
+                            <button onclick="toggleView('list')" id="list-view" class="p-2 bg-gray-200 text-gray-600 rounded">
+                                ☰
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Products will be loaded dynamically -->
+                    </div>
+                    
+                    <!-- Load More -->
+                    <div class="text-center mt-12">
+                        <button onclick="loadMoreProducts()" class="btn-primary px-8 py-3">Load More Products</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shopping Cart Modal -->
+    <div id="cart-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg max-w-md w-full max-h-96 overflow-hidden">
+                <div class="p-4 border-b flex justify-between items-center">
+                    <h3 class="text-lg font-semibold">Shopping Cart</h3>
+                    <button onclick="toggleCart()" class="text-gray-500 hover:text-gray-700">✕</button>
+                </div>
+                <div class="p-4 max-h-64 overflow-y-auto" id="cart-items">
+                    <!-- Cart items will be loaded dynamically -->
+                </div>
+                <div class="p-4 border-t">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="font-semibold">Total: $<span id="cart-total">0.00</span></span>
+                    </div>
+                    <button class="btn-primary w-full" onclick="checkout()">Checkout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification bg-teal-600 text-white px-6 py-3 rounded-lg shadow-lg">
+        <span id="notification-text"></span>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>
